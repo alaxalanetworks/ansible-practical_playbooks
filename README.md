@@ -27,6 +27,7 @@
 ## 追加pythonプログラム
 - textfsm
 - sftp
+- scp
 
 
 
