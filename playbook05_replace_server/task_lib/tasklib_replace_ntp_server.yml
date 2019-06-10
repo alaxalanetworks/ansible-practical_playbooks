@@ -1,0 +1,13 @@
+    # 新しいNTPサーバの設定を追加
+    - name: add new ntp server
+      ax_config: 
+        lines:
+          - ntp server {{ new_ntp_server_ip }}
+        save_when: modified
+
+    # 古いNTPサーバの設定を削除
+    - name: delete old ntp server
+      ax_config: 
+        lines:
+          - no ntp server {{ old_ntp_server_ip }}
+        save_when: modified

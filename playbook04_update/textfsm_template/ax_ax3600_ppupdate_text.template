@@ -1,0 +1,6 @@
+Value CURRENT_VERSION (\S+)
+Value NEW_VERSION (\S+)
+
+Start
+  ^Current\s*version\s*is\s*${CURRENT_VERSION}.*$$
+  ^New\s*version\s*is\s*${NEW_VERSION}.*$$ -> Record

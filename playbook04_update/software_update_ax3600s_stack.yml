@@ -1,0 +1,77 @@
+- name: Software update for AX3600S stack
+  hosts: 10.100.1.102
+  gather_facts: no
+  connection: network_cli
+
+  # AX3600Sモデル スタック時のソフトウェアアップデートPlaybook
+
+  vars:
+    ansible_command_timeout: 1200
+
+  tasks:
+    # 作業前後のバージョン情報格納ディレクトリresultを作成
+    - name: generate a directory to store result
+      file:
+        path: "./result/"
+        state: directory
+      delegate_to: localhost
+
+    # ax_factsモジュールを使ってネットワーク機器のホスト名を取得
+    - name: gather ax facts "all"
+      ax_facts:
+        gather_subset:
+          - "all"
+
+    # show versionを実行し、表示結果を変数show_version_beforeに格納
+    - name: check before Version
+      ax_command:
+        commands:
+          - "show version"
+      register: show_version_before
+
+    # アップデート前のバージョンをAnsibleホスト上のファイルに格納
+    # ファイル名：version_<ネットワーク機器のホスト名>_before.txt
+    - name: get show version
+      copy:
+        content: "{{ show_version_before.stdout_lines[0] | join('\n') }}"
+        dest: "./result/version_{{ ansible_net_hostname }}_before.txt"
+
+    # アップデートファイルのサイズとネットワーク機器の空きディスク容量を確認し、
+    # 空きディスク容量が十分であればアップデートファイルを転送するタスクの呼び出し
+    - name: compare local k.img filesize and network device's free space 
+      include_tasks: task_lib/cmp_filesize.yml
+
+    # アップデートファイルが期待するバージョンであるかをチェックするタスクの呼び出し
+    - name: firmware Version check
+      include_tasks: task_lib/firm_version_check.yml
+
+    # スタックのバックアップスイッチをアップデートするタスクの呼び出し
+    - name: execute ppupdate for Backup Switch 
+      include_tasks: task_lib/backup_switch_ppupdate.yml
+
+    # スタックのマスタスイッチをアップデートするタスクの呼び出し
+    - name: execute ppupdate for Master Switch
+      include_tasks: task_lib/master_switch_ppupdate.yml
+
+    # show versionを実行し、表示結果を変数show_version_afterに格納
+    - name: check after Version
+      ax_command:
+        commands:
+          - show version
+      register: show_version_after
+
+    # アップデート後のバージョンをAnsibleホスト上のファイルに格納
+    # ファイル名：version_<ネットワーク機器のホスト名>_after.txt
+    - name: get show version
+      copy:
+        content: "{{ show_version_after.stdout_lines[0] | join('\n') }}"
+        dest: "./result/version_{{ ansible_net_hostname }}_after.txt"
+
+    # アップデート前後のバージョン情報をdiffした結果をファイルに格納
+    # ファイル名：version_<ネットワーク機器のホスト名>_diff.txt
+    - name: get difference between before and after for group "all"
+      shell: "diff -u ./result/version_{{ ansible_net_hostname }}_before.txt
+                      ./result/version_{{ ansible_net_hostname }}_after.txt
+                        > ./result/version_{{ ansible_net_hostname }}_diff.txt"
+      register: result_diff
+      failed_when: result_diff.rc not in [0, 1]

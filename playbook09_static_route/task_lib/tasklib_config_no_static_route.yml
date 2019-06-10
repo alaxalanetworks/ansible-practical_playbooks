@@ -1,0 +1,7 @@
+    # スタティック経路の削除
+    - name: Unconfigure static route
+      ax_config:
+        lines:
+          - "no ip route {{ item.prefix }} {{ item.mask }} {{ item.nexthop }} poll"
+        save_when: modified
+      with_items: "{{ static_route }}"

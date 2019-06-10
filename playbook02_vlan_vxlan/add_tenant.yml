@@ -1,0 +1,35 @@
+- name: Add tenant to existing network
+  hosts: all
+  gather_facts: no
+  connection: network_cli
+
+  max_fail_percentage: 0
+   
+  # 既存VLAN/VXLANネットワークにVLAN/VNIを追加するPlaybookです。
+
+  tasks: 
+    # 作業前にコンフィグレーションを保存するタスクの呼び出し
+    - name: Call store config before tasks
+      include_tasks: ./task_lib/tasklib_store_config_before.yml
+
+    # 追加するVLANが既に設定されていないかをチェックするタスクの呼び出し
+    - name: Call "check_vlan_absent.yml" for group "all"
+      include_tasks: task_lib/tasklib_check_vlan_absent.yml  
+
+    # 追加するVNIが既に設定されていないかをチェックするタスクの呼び出し
+    - name: Call "check_vni_absent.yml" for group "core"
+      include_tasks: task_lib/tasklib_check_vni_absent.yml  
+      when: "inventory_hostname in groups['core']"    
+
+    # VLAN追加タスクの呼び出し
+    - name: Call "add_vlan.yml" for group "all"
+      include_tasks: task_lib/tasklib_add_vlan.yml  
+
+    # VNI追加タスクの呼び出し
+    - name: Call "add_vni.yml " for group "core"
+      include_tasks: task_lib/tasklib_add_vni.yml 
+      when: "inventory_hostname in groups['core']"            
+
+    # 作業後のコンフィグレーションを保存し、diffを作成するタスクの呼び出し
+    - name: Call store config after tasks
+      include_tasks: ./task_lib/tasklib_store_config_after.yml

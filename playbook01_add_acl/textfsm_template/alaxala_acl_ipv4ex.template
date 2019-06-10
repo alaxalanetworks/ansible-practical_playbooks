@@ -1,0 +1,8 @@
+Value AclName (\S+)
+Value Required Kind (ip access-list extended)
+Value List AclEntry (\d+ (permit|deny) [\S\s\w]+[\S\w]+)
+
+Start
+  ^! -> Continue.Record
+  ^${Kind} ${AclName}
+  ^\s\s${AclEntry}

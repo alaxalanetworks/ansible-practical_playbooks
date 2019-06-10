@@ -1,0 +1,9 @@
+Value Filldown VTEPID (\d+)
+Value Required VNI (\d+)
+Value Required STATUS (enable|disable)
+Value LEARNING (\S+)
+
+Start
+  ^VTEP ID: ${VTEPID}
+  ^\s+VNI: ${VNI}\s+Status: ${STATUS}
+  ^\s+Learning: ${LEARNING} -> Record

@@ -1,0 +1,5 @@
+# static route settings
+static_route:
+  - { prefix: 20.0.0.0, mask: 255.255.255.0, nexthop: 10.100.255.253 }
+  - { prefix: 30.0.0.0, mask: 255.255.255.0, nexthop: 10.100.255.253 }
+  - { prefix: 40.0.0.0, mask: 255.255.255.0, nexthop: 10.100.255.253 }

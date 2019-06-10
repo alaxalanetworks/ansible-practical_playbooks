@@ -1,0 +1,13 @@
+#show_switch.template
+Value STATUS (\S+)
+Value MASTER_SW (\d+)
+Value SW_NO (\d+)
+Value SW_STAT (\S+)
+Value MODEL (\S+)
+Value MACHINE (\S+)
+Value PRI (\S+)
+Value VER (\S+)
+
+Start
+  ^Stack status\s*:\s*${STATUS}[ ]{9}Switch No\s*:\s*${MASTER_SW}.*$$
+  ^\s${SW_NO}\s+${SW_STAT}\s+${MODEL}\s+${MACHINE}\s+${PRI}\s+${VER} -> Record

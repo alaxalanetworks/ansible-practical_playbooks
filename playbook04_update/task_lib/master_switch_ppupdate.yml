@@ -1,0 +1,33 @@
+    # マスタスイッチのアップデートを実行
+    - name: execute ppupdate (Master Switch)
+      ax_command:
+        commands:
+          - command: "ppupdate switch {{ check_master[0].MASTER_SW }} {{ remote_firm_path }}k.img"
+            prompt:
+              - "Do you wish to continue?"
+            answer: y
+      async: 1200
+      poll: 5
+
+    # 新マスタスイッチへのSSHアクセスが可能になるのを待つ
+    - name: wait for new master switch SSH access
+      wait_for:
+        host: "{{ inventory_hostname }}"
+        port: 22
+        state: started
+        delay: 60
+
+    # 旧マスタスイッチがスタックに追加されるのを確認する
+    - name: check stack status
+      ax_command:
+        commands:
+          - "show switch"
+      register: show_switch
+      until: ("Backup" in show_switch.stdout[0])
+      retries: 50
+      delay: 30
+
+    # 30秒待ち
+    - name: pause 30 seconds
+      pause:
+        seconds: 30

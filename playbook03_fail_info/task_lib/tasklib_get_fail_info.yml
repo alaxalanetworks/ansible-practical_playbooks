@@ -1,0 +1,57 @@
+# モデル判別のためにax_factsモジュールで機器情報を取得
+- name: gather ax facts "all"
+  ax_facts:
+    gather_subset:
+      - "all"
+
+# AX2500Sモデルの場合
+- block:
+  # show tech-support ramdiskを実行し、RAMDISK上に障害情報を生成
+  - name: do show tech-suport ramdisk
+    ax_command:
+      commands:
+        - command: show tech-support ramdisk
+
+  # ネットワーク機器のRAMDISK上にある障害情報をAnsibleホスト上に転送
+  - name: copy file from network device
+    net_get:
+      dest: "./result/{{ ansible_net_hostname }}_showtech.txt"
+      src: "/ramdisk/showtech.txt"
+      protocol: sftp
+  when: "'AX25' in ansible_net_model"
+
+# AX3600Sモデルの場合
+- block:
+  # show tech-supportを実行し、flash上に障害情報を生成
+  # enableパスワードを設定している場合の処理
+  # enableパスワードがない場合は、prompt, answerの行は不要
+  - name: do show tech-suport flash
+    ax_command:
+      commands:
+        - command: show tech-support > showtech.txt
+          prompt: "Specify Password for Administrator Mode.:"
+          answer: "{{ ansible_become_pass }}"
+
+  # ネットワーク機器のflash上にある障害情報をAnsibleホスト上に転送
+  - name: copy file from network device
+    net_get:
+      dest: "./result/{{ ansible_net_hostname }}_showtech.txt"
+      src: "/mc0/usr/home/alaxala/showtech.txt"
+      protocol: scp
+
+  # ダンプファイルrmdumpが作成されているかを確認するため、
+  # ls /dump0を実行し、rmdump_check変数に表示結果を格納
+  - name: check file rmdump
+    ax_command:
+      commands: "ls /dump0"
+    register: rmdump_check
+
+  # rmdumpが作成されていたら、ネットワーク機器からrmdumpファイルをAnsibleホスト上に転送
+  - name: copy dump-file from network device
+    net_get:
+      dest: "./result/{{ ansible_net_hostname }}_rmdump"
+      src: "/dump0/rmdump"
+      protocol: scp
+    when:
+      - rmdump_check.stdout[0] == "rmdump"
+  when: "'AX36' in ansible_net_model"

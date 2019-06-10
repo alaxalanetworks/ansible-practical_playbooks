@@ -1,0 +1,26 @@
+    # show ip bgp neighborsを実行し、表示結果を変数show_ip_bgp_neighbors_resultに格納
+    - name: Get 'show ip bgp neighbors' command result
+      ax_command:
+        commands: show ip bgp neighbors
+      register: show_ip_bgp_neighbors_result
+
+    # show ip bgp neighborsの表示結果をパースし、ピア毎の状態等を抽出
+    - name: Parse command result
+      set_fact:
+        parsed_result: "{{ show_ip_bgp_neighbors_result.stdout[0] | parse_cli_textfsm( textfsm_template ) }}"
+
+    # BGPピアが存在しなかった場合、fail
+    - name: Assert if configured BGP peer is not in command result
+      assert:
+        that:
+          - "item.PEER_ADDRESS in bgp.neighbors"
+      with_items:
+        - "{{ parsed_result }}"
+
+    # BGPピアの状態が"Established"でなかった場合、fail
+    - name: Assert if BGP peer status is not "Established"
+      assert:
+        that:
+          - "item.STATUS == 'Established'"
+      with_items:
+        - "{{ parsed_result }}"

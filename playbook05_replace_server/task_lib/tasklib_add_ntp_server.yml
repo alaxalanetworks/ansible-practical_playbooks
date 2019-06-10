@@ -1,0 +1,6 @@
+    # NTPサーバの設定を追加
+    - name: add ntp server 
+      ax_config:
+        lines:
+          - "ntp server {{ add_ntp_server_ip }}" 
+        save_when: modified

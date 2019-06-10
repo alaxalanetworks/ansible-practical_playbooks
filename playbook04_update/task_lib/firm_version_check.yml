@@ -1,0 +1,20 @@
+    # アップデートファイルのバージョン表示情報を取得し、変数ppupdate_textに格納
+    - name: get ppupdate text
+      ax_command:
+        commands:
+          - command: ppupdate {{ remote_firm_path }}k.img
+            prompt:
+              - Do you wish to continue?
+            answer: n
+      register: ppupdate_text
+
+    # バージョン情報をパースし、バージョン情報を抽出
+    - name: parse firmware Current/New Version
+      set_fact:
+        check_ver: "{{ ppupdate_text.stdout[0] | parse_cli_textfsm( template_ppupdate_text ) }}"
+
+    # バージョンが期待するバージョンでなかった場合、fail
+    - name: assert if firmware version is not expected
+      assert:
+        that:
+          - "check_ver[0].NEW_VERSION == firm_check_version"

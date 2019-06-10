@@ -1,0 +1,35 @@
+- name: Configure Static route(s) and check it
+  hosts: core
+  gather_facts: no
+  connection: network_cli
+  max_fail_percentage: 0
+
+  # スタティック経路を設定するPlaybook
+  #
+  tasks:
+    # 作業前にコンフィグレーションを保存するタスクの呼び出し
+    - name: Call store config before tasks
+      include_tasks: ./task_lib/tasklib_store_config_before.yml
+
+    # スタティック経路を追加する前のチェックを行うタスクの呼び出し
+    - name: Call check before configure static route tasks
+      include_tasks: ./task_lib/tasklib_check_static_route_before.yml
+      with_items: "{{ static_route }}"
+      loop_control:
+        loop_var: static
+
+    # スタティック経路を追加するタスクの呼び出し
+    - name: Call config static route tasks
+      include_tasks: ./task_lib/tasklib_config_static_route.yml
+
+    # スタティック経路を追加した後のチェックを行うタスクの呼び出し
+    - name: Call check after configure static route
+      include_tasks: ./task_lib/tasklib_check_static_route_after.yml
+      with_items: "{{ static_route }}"
+      loop_control:
+        loop_var: static
+
+    # 作業後にコンフィグレーションを保存し、diffを作成するタスクの呼び出し
+    - name: Call store config after tasks
+      include_tasks: ./task_lib/tasklib_store_config_after.yml
+

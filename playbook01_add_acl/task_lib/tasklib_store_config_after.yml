@@ -1,0 +1,20 @@
+    # ax_factsモジュールでコンフィグレーションを含む機器情報を取得
+    - name: Get ax facts "all"
+      ax_facts:
+        gather_subset:
+          - "all"
+
+    # 取得した作業後コンフィグレーションをAnsibleホスト上に格納
+    # ファイル名：rconf_<ネットワーク機器のホスト名>_after.cnf
+    - name: copy running-config into rconf_<hostname>_after.cnf
+      copy:
+        content: "{{ ansible_net_config}}"
+        dest: "./result/rconf_{{ ansible_net_hostname }}_after.cnf"
+
+    # 作業前のコンフィグと作業後のコンフィグの diff を取ったファイルを作成
+    - name: get difference between before and after for group "all"
+      shell: "diff -u ./result/rconf_{{ ansible_net_hostname }}_before.cnf
+                      ./result/rconf_{{ ansible_net_hostname }}_after.cnf
+                        > ./result/rconf_{{ ansible_net_hostname }}_diff.txt"
+      register: result_diff
+      failed_when: result_diff.rc not in [0, 1]

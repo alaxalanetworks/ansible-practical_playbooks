@@ -1,0 +1,37 @@
+- name: configure BGP base/peer and check BGP peer status
+  hosts: core
+  gather_facts: no
+  connection: network_cli
+  max_fail_percentage: 0
+
+  vars:
+    textfsm_template: './textfsm_template/ax_ax3600_show_ip_bgp_neighbors.template'
+
+  # 複数ルータのBGPのピアを設定するPlaybook
+
+  tasks:
+    # 作業前にコンフィグレーションを保存するタスクの呼び出し
+    - name: Call store config before tasks
+      include_tasks: ./task_lib/tasklib_store_config_before.yml
+
+    # BGPルータのベース部分(ルータID等)を設定するタスクの呼び出し
+    - name: Call config BGP base config tasks
+      include_tasks: ./task_lib/tasklib_config_bgp_base.yml
+
+    # BGPルータのピア部分を設定するタスクの呼び出し
+    - name: Call config BGP peer config tasks
+      include_tasks: ./task_lib/tasklib_config_bgp_peer.yml
+
+    # 作業後にコンフィグレーションを保存し、diffを作成するタスクの呼び出し
+    - name: Call store config after tasks
+      include_tasks: ./task_lib/tasklib_store_config_after.yml
+
+    # BPGのピアが確立されるまで、60秒間待つ
+    # 60秒以上待つ必要がある場合、または、より短くても確立する場合、修正が必要
+    - name: Pause 60 seconds for waiting BGP peer established
+      pause:
+        seconds: 60
+
+    # BGPピアの状態を確認するタスクの呼び出し
+    - name: Call check BGP peer status tasks
+      include_tasks: ./task_lib/tasklib_check_bgp_peer.yml

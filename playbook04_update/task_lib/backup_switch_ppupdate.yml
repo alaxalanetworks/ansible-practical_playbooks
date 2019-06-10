@@ -1,0 +1,41 @@
+    # show switchを実行し、表示結果を変数show_switchに格納
+    - name: get show switch result
+      ax_command:
+        commands:
+          - "show switch"
+      register: show_switch
+
+    # show switchの表示結果をパースし、変数check_masterに格納
+    - name: check Master Switch
+      set_fact:
+        check_master: "{{ show_switch.stdout[0] | parse_cli_textfsm( template_show_switch ) }}"
+      register: check_master
+
+    # マスタスイッチからバックアップスイッチにアップデートファイルをコピー
+    - name: copy firmware from Master to Backup
+      ax_command:
+        commands:
+          - command: "cp {{ remote_firm_path }}k.img switch
+                         {{ backup_sw[check_master[0].MASTER_SW | int] }} {{ remote_firm_path }}k.img"
+
+    # バックアップスイッチのアップデートを実行
+    - name: execute ppupdate (Backup Switch)
+      ax_command:
+        commands:
+          - command: "ppupdate switch {{ backup_sw[check_master[0].MASTER_SW | int] }}
+                                      {{ remote_firm_path }}k.img"
+            prompt:
+              - "Do you wish to continue?"
+            answer: y
+      async: 1200
+      poll: 5
+
+    # バックアップスイッチがスタックに追加されるのを待つ
+    - name: check stack status
+      ax_command:
+        commands:
+          - "show switch"
+      register: show_switch
+      until: ("Backup" in show_switch.stdout[0])
+      retries: 50
+      delay: 30

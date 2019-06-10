@@ -1,0 +1,23 @@
+- name: Replace ntp server
+  hosts: all
+  gather_facts: no
+  connection: network_cli
+  max_fail_percentage: 0
+   
+  vars:
+    old_ntp_server_ip: '10.0.0.1'
+    new_ntp_server_ip: '10.0.0.2'
+
+  # NTPサーバのリプレースに伴いネットワーク機器の設定を更新するPlaybook
+  tasks: 
+    # 作業前にコンフィグレーションを保存するタスクの呼び出し
+    - name: Call store config before tasks
+      include_tasks: ./task_lib/tasklib_store_config_before.yml
+
+    # NTPサーバの設定を更新するタスクの呼び出し
+    - name: Call replace ntp server config tasks
+      include_tasks: ./task_lib/tasklib_replace_ntp_server.yml
+
+    # 作業後にコンフィグレーションを保存し、diffを作成するタスクの呼び出し
+    - name: Call store config after tasks
+      include_tasks: ./task_lib/tasklib_store_config_after.yml

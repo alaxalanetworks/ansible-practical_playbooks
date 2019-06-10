@@ -1,0 +1,9 @@
+Value PEER_ADDRESS (\d+\.\d+\.\d+\.\d+)
+Value PEER_AS (\d+)
+Value LOCAL_ADDRESS (\d+\.\d+\.\d+\.\d+)
+Value LOCAL_AS (\d+)
+Value TYPE (\S+)
+Value STATUS (\S+)
+
+Start
+  ^${PEER_ADDRESS}\s+${PEER_AS}\s+${LOCAL_ADDRESS}\s+${LOCAL_AS}\s+${TYPE}\s+${STATUS} -> Record

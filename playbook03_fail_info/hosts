@@ -1,0 +1,9 @@
+[all:children]
+core
+edge
+
+[core]
+10.100.1.102
+
+[edge]
+10.100.1.202

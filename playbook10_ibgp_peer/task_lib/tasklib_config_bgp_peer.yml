@@ -1,0 +1,9 @@
+    # BGPピア部分の設定
+    - name: configure bgp neighbors
+      ax_config:
+        lines:
+          - neighbor {{ item }} remote-as {{ bgp.as }}
+          - neighbor {{ item }} update-source vlan {{ bgp.update_source_vlan }}
+        parents: router bgp {{ bgp.as }}
+        save_when: modified
+      with_items: "{{ bgp.neighbors }}"

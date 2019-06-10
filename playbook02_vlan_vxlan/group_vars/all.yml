@@ -1,0 +1,9 @@
+    ansible_network_os: ax
+    ansible_user: alaxala
+    ansible_password: alaxala
+    ansible_become: yes
+    ansible_become_method: enable
+    ansible_become_pass: alaxala
+  
+    template_show_vlan_list: 'textfsm_template/alaxala_show_vlan_list.template'     
+    template_show_vxlan_vni: 'textfsm_template/alaxala_show_vxlan_vni.template'  

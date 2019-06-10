@@ -1,0 +1,6 @@
+## inventory_hostname == 10.100.1.102
+
+    vid: '601'
+    port: '1/0/11'
+    vni: '601'
+    vtep: '1'

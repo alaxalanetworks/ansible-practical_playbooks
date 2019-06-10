@@ -1,0 +1,26 @@
+- name: Network device shutdown
+- hosts: all
+  gather_facts: no
+  connection: network_cli
+  max_fail_percentage: 0
+
+  # ネットワーク機器を停止するPlaybook
+
+  tasks:
+    # ax_factsモジュールを用いてモデル情報を含む機器情報の取得
+    - name: gather ax facts "hardware"
+      ax_facts:
+        gather_subset:
+          - "hardware"
+
+    # ネットワーク機器を停止するタスクの呼び出し
+    - name: Call network device shutdown playbook
+      include_tasks: task_lib/tasklib_device_shutdown.yml
+
+    # ネットワーク機器が停止したことを確認
+    - name: Check if the network devices had stopped properly
+      wait_for:
+        host: "{{ inventory_hostname }}"
+        port: 22
+        state: stopped
+        delay: 60

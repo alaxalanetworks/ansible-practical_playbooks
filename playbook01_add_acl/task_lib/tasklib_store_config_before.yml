@@ -1,0 +1,19 @@
+    # 作業前後のコンフィグと diff ファイルを格納する result ディレクトリを作成
+    - name: generate a directory to store result
+      file:
+        path: "./result/"
+        state: directory
+      delegate_to: localhost
+
+    # ax_facts モジュールでコンフィグレーションを含む機器情報を取得
+    - name: Get ax facts "all"
+      ax_facts:
+        gather_subset:
+          - "all"
+
+    # 作業前のコンフィグレーションをAnsibleホスト上に格納
+    # ファイル名： rconf_<ネットワーク機器のホスト名>_before.cnf
+    - name: copy running-config into rconf_<hostname>_before.cnf
+      copy:
+        content: "{{ ansible_net_config}}"
+        dest: "./result/rconf_{{ ansible_net_hostname }}_before.cnf"

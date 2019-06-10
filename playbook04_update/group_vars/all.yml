@@ -1,0 +1,16 @@
+    ansible_network_os: ax
+    ansible_user: alaxala
+    ansible_password: alaxala
+    ansible_become: yes
+    ansible_become_method: enable
+    ansible_become_pass: alaxala
+
+    local_firm_path: './firmware/'
+    remote_firm_path: '/mc0/usr/var/update/'
+    firm_filename: 'AX36L3M1201F-312.img.gz'
+    firm_check_version: '12.1.F'
+    backup_sw: [0,2,1]
+
+    template_show_switch: 'textfsm_template/ax_ax3600_show_switch.template'
+    template_show_flash: 'textfsm_template/ax_ax3600_show_flash.template'
+    template_ppupdate_text: 'textfsm_template/ax_ax3600_ppupdate_text.template'

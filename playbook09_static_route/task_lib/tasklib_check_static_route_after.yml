@@ -1,0 +1,11 @@
+    # show ip route static <IPv4プレフィックス> <マスク>を実行し、NextHop情報のみをgrepで抽出
+    - name: Execute show ip route and grep "NextHop"
+      ax_command:
+        commands: "show ip route static {{ static.prefix }} {{ static.mask }} | grep NextHop"
+      register: command_result
+
+    # ネクストホップ情報が存在した場合、fail
+    - name: Assert if command_result has no NextHop information
+      assert:
+        that:
+          - "static.nexthop in command_result.stdout[0]"

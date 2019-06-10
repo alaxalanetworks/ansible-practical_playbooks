@@ -1,0 +1,17 @@
+    # running-configをパースしてACL情報を抽出する
+    # このタスクを実行するには事前にax_factsモジュールでコンフィグ情報を取得する必要あり
+    - name: Parse running-config (Must call ax_facts before this task)
+      set_fact:
+        acl_config: "{{ ansible_net_config | parse_cli_textfsm( template ) }}"
+
+    # 既存のACLエントリに追加するACLエントリと同一のシーケンスがあるかどうかをチェック
+    # あった場合、かつ、既存ACLエントリと追加ACLエントリの内容が異なる場合はfail
+    # (上書きで既存ACLエントリ削除を防止)
+    - name: Check if ACL entry exists
+      assert:
+        that:
+          - "'{{ add_acl_seq }} {{ add_acl_entry }}' ==  '{{ item.1 }}'"
+      when: item.1 | match( "^" + add_acl_seq + " ")
+      with_subelements:
+        - "{{ acl_config }}"
+        - AclEntry

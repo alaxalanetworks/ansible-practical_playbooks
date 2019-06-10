@@ -1,0 +1,14 @@
+    # VLANを作成
+    - name: configure "vlan <vid>"
+      ax_config:
+        lines:
+           - vlan {{ vid }}
+
+    # ポートに作成したVLANを割り当て
+    - name: configure "switchport trunk allowed vlan add <vid> in <port> "
+      ax_config:
+        lines:
+           - switchport trunk allowed vlan add {{ vid }}
+        parents: "interface {{ ansible_net_interfaces[ item ].linespeed }} {{ item }}"
+      with_items: "{{ port }}"
+

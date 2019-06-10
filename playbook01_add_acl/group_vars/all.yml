@@ -1,0 +1,10 @@
+ansible_network_os: ax
+ansible_user: alaxala
+ansible_password: alaxala
+ansible_become: yes
+ansible_become_method: enable
+ansible_become_pass: alaxala
+
+template: 'textfsm_template/alaxala_acl_ipv4ex.template'
+add_acl_seq: '10030'
+add_acl_entry: 'deny tcp any any eq 445'

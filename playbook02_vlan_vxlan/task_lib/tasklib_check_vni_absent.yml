@@ -1,0 +1,18 @@
+    # show vxlan vniを実行し、表示結果を変数result_show_vxlan_vniに格納
+    - name: execute "show vxlan vni"  
+      ax_command:
+        commands:
+           - show vxlan vni
+      register: result_show_vxlan_vni
+
+    # show vxlan vniの表示結果をパースして、VNI情報を抽出
+    - name: parse result_show_vxlan_vni
+      set_fact:
+        parse_show_vxlan_vni: "{{ result_show_vxlan_vni.stdout[0]
+                   | parse_cli_textfsm( template_show_vxlan_vni ) }}"      
+
+    # 追加するVNIが既に設定済みかをチェックし、設定済みであればfail
+    - name: check if <vni> absents on target hosts
+      assert: 
+        that: 
+           - "'{{ vni }}' not in (parse_show_vxlan_vni | map(attribute='VNI') | list)"

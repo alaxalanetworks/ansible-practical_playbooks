@@ -1,0 +1,13 @@
+    # statモジュールでファイル情報を取得
+    - name: Get backup file stat info to check file size
+      stat:
+        path: ./backup/{{ config_backup_filename }}
+      register: stat_result
+      delegate_to: localhost
+
+    # ファイルのサイズが0バイトだったらfail
+    - name: Assert if backup file size is 0 bytes
+      assert:
+        that:
+          - "stat_result.stat.size > 0"
+      delegate_to: localhost

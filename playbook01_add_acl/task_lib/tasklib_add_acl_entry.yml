@@ -1,0 +1,8 @@
+    # ip access-list extended <ACL名称>に指定のエントリを追加
+    - name: add ACL entry config
+      ax_config:
+        lines:
+          - "{{ add_acl_seq }} {{ add_acl_entry }}"
+        parents: "ip access-list extended {{ item.AclName }}"
+        save_when: modified
+      with_items: "{{ acl_config }}"

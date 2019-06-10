@@ -1,0 +1,17 @@
+    # AX2500Sモデルの場合
+    # reload stop -fを実行してネットワーク機器を停止
+    - name: AX2500S Execute reload stop
+      ax_command:
+        commands: reload stop -f
+      async: 60
+      poll: 1
+      when: "'AX25' in ansible_net_model"
+
+    # AX3600Sモデルの場合
+    # reload -f no-dump-image stopを実行してネットワーク機器を停止
+    - name: AX3600S Execute reload stop
+      ax_command:
+        commands: reload -f no-dump-image stop
+      async: 60
+      poll: 1
+      when: "'AX36' in ansible_net_model"

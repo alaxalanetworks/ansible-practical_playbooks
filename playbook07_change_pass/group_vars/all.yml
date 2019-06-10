@@ -1,0 +1,10 @@
+    ansible_network_os: ax
+    ansible_user: alaxala
+#    ansible_password: alaxala
+    ansible_password: ala123ala
+    ansible_become: yes
+    ansible_become_method: enable
+    ansible_become_pass: alaxala
+
+#    new_password: ala123ala
+    new_password: alaxala

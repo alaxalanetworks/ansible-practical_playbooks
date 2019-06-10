@@ -1,0 +1,19 @@
+- name: Configuration backup
+  hosts: all
+  gather_facts: no
+  connection: network_cli
+  max_fail_percentage: 0
+
+  # ネットワーク機器のコンフィグレーションをユーザ任意のファイル名称で保存するplaybook
+  # 本playbookでは、backupディレクトリを作成して、
+  # config_<インベントリホスト名称>_YYYY-MM-DD-HHMM.txt
+  # という名前で保存
+
+  tasks:
+    # コンフィグバックアップタスクを呼び出す
+    - name: Call backup configuration tasks
+      include_tasks: task_lib/tasklib_get_config_backup.yml
+
+    # バックアップしたコンフィグレーションファイルのサイズが0バイトであるかをチェック
+    - name: Call check backup file size tasks
+      include_tasks: task_lib/tasklib_check_backup_filesize.yml

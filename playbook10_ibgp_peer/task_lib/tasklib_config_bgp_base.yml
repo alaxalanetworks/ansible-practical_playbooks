@@ -1,0 +1,9 @@
+    # BGPルータのベース設定(ルータID等)を設定
+    # サンプルとしてはルータID、直結経路の再配布を設定
+    - name: configure bgp router base config
+      ax_config:
+        lines:
+          - bgp router-id {{ bgp.routerid }}
+          - redistribute connected
+        parents: router bgp {{ bgp.as }}
+        save_when: modified

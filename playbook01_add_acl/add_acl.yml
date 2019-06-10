@@ -1,0 +1,24 @@
+- name: Add ACL entry to existing all ACL
+  hosts: all
+  gather_facts: no
+  connection: network_cli
+  max_fail_percentage: 0
+
+  # 既存のACLにACLエントリを追加するplaybookです。
+
+  tasks:
+    # 作業前にコンフィグレーションを保存するタスクの呼び出し
+    - name: Call store config before tasks
+      include_tasks: ./task_lib/tasklib_store_config_before.yml
+
+    # 既存ACLのエントリと追加するエントリでコンフリクトがないかをチェックするタスクの呼び出し
+    - name: Call check ACL entry tasks
+      include_tasks: ./task_lib/tasklib_check_acl_entry.yml
+
+    # エントリを追加するタスクの呼び出し
+    - name: Call add ACL entry tasks
+      include_tasks: ./task_lib/tasklib_add_acl_entry.yml
+
+    # 作業後にコンフィグレーションを保存し、diffを作成するタスクの呼び出し
+    - name: Call store config after tasks
+      include_tasks: ./task_lib/tasklib_store_config_after.yml

@@ -1,0 +1,61 @@
+# カレントディレクトリにbackupディレクトリを作成
+- name: COMMON generate a directory to store backup configuration
+  file:
+    path: "./backup/"
+    state: directory
+  delegate_to: localhost
+
+# ax_factsモジュールでネットワーク機器のモデル名を含む情報を収集
+- name: COMMON gather ax facts "hardware"
+  ax_facts:
+    gather_subset:
+      - "hardware"
+
+# バックアップするファイル名称を決定
+# ファイル名：config_<インベントリホストホスト名称>_YYYY-MM-DD-HHMM.txt
+- name: COMMON Create backup filename
+  set_fact:
+    config_backup_filename: config_{{ inventory_hostname }}_{{ lookup('pipe', 'date +%Y-%m-%d-%H%M') }}.txt
+
+# 装置仕様の関係上、バックアップ実行前にコンフィグレーションを保存
+- name: COMMON Save before backup configuration
+  ax_config:
+    save_when: always
+
+# AX2500Sモデルの場合
+- block:
+  # startup-config を RAMDISK上に保存
+  - name: AX2500S copy startup-config to ramdisk
+    ax_command:
+      commands:
+        - command: copy startup-config ramdisk {{ config_backup_filename }}
+    async: 240
+    poll: 1
+
+  # ネットワーク機器上のファイルをAnsible実行ホスト上にsftpでコピー
+  - name: AX2500S Get backup configuration from remote network device 
+    net_get:
+      dest: ./backup/{{ config_backup_filename }}
+      src: /ramdisk/{{ config_backup_filename }}
+      protocol: sftp
+  when: "'AX25' in ansible_net_model"
+
+# AX3600Sモデルの場合
+- block:
+  # startup-config を ネットワーク機器上のフラッシュに保存
+  - name: AX3600S copy startup-config to {{ ansible_user }} home directory
+    ax_command:
+      commands:
+        - command: copy startup-config {{ config_backup_filename }}
+          prompt:
+            - 'Configuration file copy to /mc0/usr/home/{{ ansible_user }}'
+          answer: y
+    async: 240
+    poll: 1
+
+  # ネットワーク機器上のファイルをAnsible実行ホスト上にscpでコピー
+  - name: AX3600S Get backup configuration from remote network device 
+    net_get:
+      dest: ./backup/{{ config_backup_filename }}
+      src: /mc0/usr/home/{{ ansible_user }}/{{ config_backup_filename }}
+  when: "'AX36' in ansible_net_model"

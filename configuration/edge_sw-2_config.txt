@@ -1,0 +1,163 @@
+#configuration list for AX2530S-24T
+!
+hostname "AX2530S-2"
+clock timezone "JST" +9 0
+!
+vlan 1
+  name "VLAN0001"
+!
+vlan 2
+!
+vlan 101
+!
+vlan 102
+!
+vlan 103
+!
+vlan 104
+!
+vlan 105
+!
+vlan 201
+!
+vlan 202
+!
+vlan 203
+!
+vlan 204
+!
+vlan 205
+!
+spanning-tree disable
+spanning-tree mode pvst
+!
+interface gigabitethernet 0/1
+  switchport mode trunk
+  switchport trunk allowed vlan 101-105
+!
+interface gigabitethernet 0/2
+  switchport mode trunk
+  switchport trunk allowed vlan 201-205
+!
+interface gigabitethernet 0/3
+  switchport mode access
+!
+interface gigabitethernet 0/4
+  switchport mode access
+!
+interface gigabitethernet 0/5
+  switchport mode access
+!
+interface gigabitethernet 0/6
+  switchport mode access
+!
+interface gigabitethernet 0/7
+  switchport mode access
+!
+interface gigabitethernet 0/8
+  switchport mode access
+!
+interface gigabitethernet 0/9
+  switchport mode access
+!
+interface gigabitethernet 0/10
+  switchport mode access
+!
+interface gigabitethernet 0/11
+  switchport mode trunk
+  switchport trunk allowed vlan 101-105,201-205
+!
+interface gigabitethernet 0/12
+  switchport mode access
+!
+interface gigabitethernet 0/13
+  switchport mode access
+!
+interface gigabitethernet 0/14
+  switchport mode access
+!
+interface gigabitethernet 0/15
+  switchport mode access
+!
+interface gigabitethernet 0/16
+  switchport mode access
+!
+interface gigabitethernet 0/17
+  switchport mode access
+!
+interface gigabitethernet 0/18
+  switchport mode access
+!
+interface gigabitethernet 0/19
+  switchport mode access
+!
+interface gigabitethernet 0/20
+  switchport mode access
+!
+interface gigabitethernet 0/21
+  switchport mode access
+!
+interface gigabitethernet 0/22
+  switchport mode access
+!
+interface gigabitethernet 0/23
+  switchport mode access
+  switchport access vlan 2
+!
+interface gigabitethernet 0/24
+  switchport mode access
+!
+interface gigabitethernet 0/25
+  switchport mode access
+!
+interface gigabitethernet 0/26
+  switchport mode access
+!
+interface gigabitethernet 0/27
+  switchport mode access
+!
+interface gigabitethernet 0/28
+  switchport mode access
+!
+interface vlan 1
+!
+interface vlan 2
+  ip address 10.100.1.202 255.255.0.0
+!
+interface vlan 101
+  ip access-group VLAN0101-in in
+!
+interface vlan 102
+!
+interface vlan 103
+!
+interface vlan 104
+!
+interface vlan 105
+!
+interface vlan 201
+  ip access-group VLAN0201-in in
+!
+interface vlan 202
+!
+interface vlan 203
+!
+interface vlan 204
+!
+interface vlan 205
+!
+ip access-list extended VLAN0101-in
+  10010 deny tcp any any eq telnet
+  10020 deny tcp any any eq ftp
+  99999 permit ip any any
+!
+ip access-list extended VLAN0201-in
+  10010 deny tcp any any eq telnet
+  10020 deny tcp any any eq ftp
+  99999 permit ip any any
+!
+line vty 0 4
+!
+ip ssh
+ip ssh version 2
+!

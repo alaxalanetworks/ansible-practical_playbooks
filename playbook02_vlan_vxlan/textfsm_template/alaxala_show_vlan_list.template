@@ -1,0 +1,12 @@
+Value VLANID (\d+)
+Value STATUS (\S+)
+Value FWD (\d+)
+Value UP (\d+)
+Value CFG (\d+)
+Value NAME (\S+)
+Value TYPE (\S+)
+Value PROTC (\S+)
+
+Start
+  ^\s+${VLANID}\s+${STATUS}\s+${FWD}/\s+${UP}/\s+${CFG}\s+${NAME}\s+${TYPE}\s+${PROTC}\s+[\S\s\S+\s+] -> Record
+

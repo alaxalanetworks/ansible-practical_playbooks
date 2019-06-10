@@ -1,0 +1,8 @@
+# BGP settings
+bgp:
+  as: '65001'
+  routerid: '1.1.1.2'
+  update_source_vlan: '10'
+  neighbors:
+    - '10.255.10.1'
+    - '10.255.10.3'

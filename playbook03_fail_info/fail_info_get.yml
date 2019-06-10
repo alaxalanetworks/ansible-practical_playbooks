@@ -1,0 +1,22 @@
+- name: Get failure information from network device
+  hosts: all
+  gather_facts: no
+  connection: network_cli
+  max_fail_percentage: 0
+
+  vars:
+    ansible_command_timeout: 1200
+
+  # 障害情報(show tech-support等)をネットワーク機器から収集するPlaybook
+
+  tasks:
+    # 障害情報を格納するディレクトリresultをAnsibleホスト上に作成
+    - name: generate a directory to store result
+      file:
+        path: "./result/"
+        state: directory
+      delegate_to: localhost
+
+    # 障害情報を収集するタスクの呼び出し
+    - name: Call get failure informaton tasks
+      include_tasks: task_lib/tasklib_get_fail_info.yml

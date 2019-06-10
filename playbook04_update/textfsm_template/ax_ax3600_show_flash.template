@@ -1,0 +1,11 @@
+Value SW_NO (\d+)
+Value STACK_STAT (\S+)
+Value USED_BYTE ([0-9,]+)
+Value FREE_BYTE ([0-9,]+)
+Value TOTAL_BYTE ([0-9,]+)
+
+Start
+  ^Switch\s*${SW_NO}\s*${STACK_STAT}.*$$
+  ^[ ]{4}used\s+${USED_BYTE}+(?i)kB.*$$
+  ^[ ]{4}free\s+${FREE_BYTE}+(?i)kB.*$$
+  ^[ ]{4}total\s+${TOTAL_BYTE}+(?i)kB.*$$ -> Record

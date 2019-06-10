@@ -1,0 +1,19 @@
+    # show vlan listを実行し、表示結果をresult_show_vlan_listに格納
+    - name: execute "show vlan list" 
+      ax_command:
+        commands:
+          - show vlan list
+      register: result_show_vlan_list
+  
+    # show vlan listの表示結果をパースしてVLAN IDを抽出
+    - name: parse result_show_vlan_list 
+      set_fact:
+        parse_show_vlan_list: "{{ result_show_vlan_list.stdout[0]
+                      | parse_cli_textfsm( template_show_vlan_list ) }}"      
+                
+    # 追加するVLANのIDが既に設定済みかをチェックし、設定済みであればfail
+    - name: check if vlan <vid> absents on target hosts
+      assert: 
+        that: 
+           - "'{{ vid }}' not in (parse_show_vlan_list | map(attribute='VLANID') | list)"
+

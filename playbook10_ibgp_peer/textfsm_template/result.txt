@@ -1,0 +1,4 @@
+Date 2000/02/14 02:45:51 JST
+Peer Address     Peer AS  Local Address    Local AS  Type      Status
+10.255.10.1      65001    10.255.10.2      65001     Internal  Established
+10.255.10.2      65001    10.255.10.1      65001     Internal  Established
